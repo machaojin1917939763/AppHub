@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppHub - 你的个人应用中心</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>AppHub</span>
+                </div>
+                
+                <nav class="nav">
+                    <a href="#home" class="nav-link active">首页</a>
+                    <a href="#my-apps" class="nav-link">我的应用</a>
+                    <a href="#create" class="nav-link">创建应用</a>
+                </nav>
+                
+                <div class="user-info">
+                    <div class="theme-toggle" id="themeToggle" title="切换深色模式">
+                        <div class="theme-toggle-track">
+                            <div class="theme-toggle-thumb">
+                                <i class="fas fa-sun theme-icon-light"></i>
+                                <i class="fas fa-moon theme-icon-dark"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="user-id">未识别</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- 欢迎区域 -->
+            <section id="home" class="page-section hero-compact">
+                <div class="hero-content">
+                    <h1 class="hero-title">欢迎来到 <span class="gradient-text">AppHub</span></h1>
+                    <p class="hero-description">
+                        创建和分享你的网页应用，一键访问所有收藏的网站
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalApps">0</div>
+                            <div class="stat-label">总应用数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="myApps">0</div>
+                            <div class="stat-label">我的应用</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="publicApps">0</div>
+                            <div class="stat-label">公开应用</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 我的应用页面 -->
+            <section id="my-apps" class="page-section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">我的应用</h1>
+                    <p class="page-subtitle">管理你创建的所有应用</p>
+                </div>
+            </section>
+
+            <!-- 应用网格 -->
+            <section class="apps-section macos-style">
+                <div class="section-header">
+                    <h2 class="section-title">应用中心</h2>
+                    <div class="header-controls">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="搜索应用..." id="searchInput">
+                            <button class="search-clear" id="searchClear" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all">
+                                <i class="fas fa-th-large"></i>
+                                <span>全部</span>
+                            </button>
+                            <button class="filter-btn" data-filter="my">
+                                <i class="fas fa-user"></i>
+                                <span>我的</span>
+                            </button>
+                            <button class="filter-btn" data-filter="public">
+                                <i class="fas fa-globe"></i>
+                                <span>公开</span>
+                            </button>
+                        </div>
+                        <button class="filter-btn" id="tagFilterToggle">
+                            <i class="fas fa-tags"></i>
+                            <span>标签筛选</span>
+                        </button>
+                        
+                        <div class="tags-popover" id="tagsPopover" style="display: none;">
+                            <div class="tags-popover-header">
+                                <span class="popover-title"><i class="fas fa-tags"></i> 选择标签</span>
+                                <button class="tags-clear" id="clearTagsFilter" style="display: none;" title="清除选择">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="tags-popover-list" id="tagsFilterList">
+                                <!-- 标签过滤器将动态添加 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 批量操作工具栏 -->
+                <div class="batch-toolbar" id="batchToolbar" style="display: none;">
+                    <div class="batch-info">
+                        <span class="batch-count">已选择 <strong id="selectedCount">0</strong> 个应用</span>
+                    </div>
+                    <div class="batch-actions">
+                        <button class="batch-btn health-check" id="batchHealthBtn">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>批量健康检查</span>
+                        </button>
+                        <button class="batch-btn danger" id="batchDeleteBtn">
+                            <i class="fas fa-trash"></i>
+                            <span>批量删除</span>
+                        </button>
+                        <button class="batch-btn secondary" id="clearSelection">
+                            <i class="fas fa-times"></i>
+                            <span>取消选择</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="apps-grid" id="appsGrid">
+                    <!-- 应用卡片将通过JavaScript动态添加 -->
+                    <div class="app-card add-app-card" id="addAppCard">
+                        <div class="add-app-content">
+                            <i class="fas fa-plus"></i>
+                            <span>创建新应用</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="loading-spinner" id="loadingSpinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>加载中...</span>
+                </div>
+                
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <i class="fas fa-ghost"></i>
+                    <h3>暂无应用</h3>
+                    <p>点击上方按钮创建你的第一个应用吧！</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 创建应用模态框 -->
+    <div class="modal" id="createAppModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建新应用</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="modal-form" id="createAppForm">
+                <div class="form-group">
+                    <label for="appName">应用名称</label>
+                    <input type="text" id="appName" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appUrl">网站地址</label>
+                    <input type="url" id="appUrl" name="url" placeholder="https://example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appIcon">图标地址 (可选)</label>
+                    <input type="url" id="appIcon" name="icon_url" placeholder="https://example.com/favicon.ico">
+                </div>
+                
+                <div class="form-group">
+                    <label for="appDescription">描述 (可选)</label>
+                    <textarea id="appDescription" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appTags">标签 (可选)</label>
+                    <div class="tags-input-container">
+                        <input type="text" id="appTags" name="tags" placeholder="输入标签后按回车添加">
+                        <div class="tags-display" id="tagsDisplay"></div>
+                    </div>
+                    <small class="form-hint">添加标签帮助分类管理应用</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="appPublic" name="is_public" checked>
+                        <span class="checkmark"></span>
+                        公开应用（其他人可以看到）
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">取消</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        创建应用
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑应用模态框 -->
+    <div class="modal" id="editAppModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑应用</h3>
+                <button class="modal-close" id="closeEditModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="modal-form" id="editAppForm">
+                <div class="form-group">
+                    <label for="editAppName">应用名称</label>
+                    <input type="text" id="editAppName" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAppUrl">网站地址</label>
+                    <input type="url" id="editAppUrl" name="url" placeholder="https://example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAppIcon">图标地址 (可选)</label>
+                    <input type="url" id="editAppIcon" name="icon_url" placeholder="https://example.com/favicon.ico">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAppDescription">描述 (可选)</label>
+                    <textarea id="editAppDescription" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAppTags">标签 (可选)</label>
+                    <div class="tags-input-container">
+                        <input type="text" id="editAppTags" name="tags" placeholder="输入标签后按回车添加">
+                        <div class="tags-display" id="editTagsDisplay"></div>
+                    </div>
+                    <small class="form-hint">添加标签帮助分类管理应用</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="editAppPublic" name="is_public">
+                        <span class="checkmark"></span>
+                        公开应用（其他人可以看到）
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">取消</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        保存修改
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 应用详情模态框 -->
+    <div class="modal" id="appDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="appDetailTitle">应用详情</h3>
+                <button class="modal-close" id="closeDetailModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="app-detail-content" id="appDetailContent">
+                <!-- 应用详情内容将动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/js/fingerprint.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
